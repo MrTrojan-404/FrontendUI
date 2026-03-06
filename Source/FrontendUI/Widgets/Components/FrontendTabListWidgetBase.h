@@ -15,6 +15,11 @@ UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class FRONTENDUI_API UFrontendTabListWidgetBase : public UCommonTabListWidgetBase
 {
 	GENERATED_BODY()
+
+	
+public:
+	void RequestRegisterTab(const FName& InTabID,const FText& InTabDisplayName);
+
 	
 private:
 	//~ Begin UWidget Interface

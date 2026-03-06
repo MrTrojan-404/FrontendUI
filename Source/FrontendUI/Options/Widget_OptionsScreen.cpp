@@ -4,9 +4,12 @@
 #include "Widget_OptionsScreen.h"
 #include "Input/CommonUIInputTypes.h"
 #include "ICommonInputModule.h"
+#include "OptionsDataRegistry.h"
+#include "DataObjects/MyListDataObject_Collection.h"
 
 #include "FrontendUI/FrontendDebugHelper.h"
- 
+#include "FrontendUI/Widgets/Components/FrontendTabListWidgetBase.h"
+
 void UWidget_OptionsScreen::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -29,7 +32,44 @@ void UWidget_OptionsScreen::NativeOnInitialized()
 			FSimpleDelegate::CreateUObject(this,&ThisClass::OnBackBoundActionTriggered)
 		)
 	);
+
+	TabListWidget_OptionsTabs->OnTabSelected.AddUniqueDynamic(this,&ThisClass::OnOptionsTabSelected);
 	
+}
+
+void UWidget_OptionsScreen::NativeOnActivated()
+{
+	Super::NativeOnActivated();
+
+	for (UListDataObject_Collection* TabCollection : GetOrCreateDataRegistry()->GetRegisteredOptionsTabCollections())
+	{
+		if (!TabCollection)
+		{
+			continue;
+		}
+
+		const FName TabID = TabCollection->GetDataID();
+
+		if (TabListWidget_OptionsTabs->GetTabButtonBaseByID(TabID) != nullptr)
+		{
+			continue;
+		}
+
+		TabListWidget_OptionsTabs->RequestRegisterTab(TabID,TabCollection->GetDataDisplayName());
+	}
+}
+
+UOptionsDataRegistry* UWidget_OptionsScreen::GetOrCreateDataRegistry()
+{	
+	if (!CreatedOwningDataRegistry)
+	{
+		CreatedOwningDataRegistry = NewObject<UOptionsDataRegistry>();
+		CreatedOwningDataRegistry->InitOptionsDataRegistry(GetOwningLocalPlayer());
+	}
+
+	checkf(CreatedOwningDataRegistry,TEXT("Data registry for options screen is not valid"));
+
+	return CreatedOwningDataRegistry;
 }
 
 void UWidget_OptionsScreen::OnResetBoundActionTriggered()
@@ -40,4 +80,8 @@ void UWidget_OptionsScreen::OnResetBoundActionTriggered()
 void UWidget_OptionsScreen::OnBackBoundActionTriggered()
 {
 	DeactivateWidget();
+}
+void UWidget_OptionsScreen::OnOptionsTabSelected(FName TabId)
+{
+	Debug::Print(TEXT("New Tab Selected. Tab ID: ") + TabId.ToString());
 }
