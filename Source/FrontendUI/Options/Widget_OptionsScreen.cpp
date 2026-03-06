@@ -8,6 +8,7 @@
 #include "DataObjects/MyListDataObject_Collection.h"
 
 #include "FrontendUI/FrontendDebugHelper.h"
+#include "FrontendUI/Widgets/Components/FrontendCommonListView.h"
 #include "FrontendUI/Widgets/Components/FrontendTabListWidgetBase.h"
 
 void UWidget_OptionsScreen::NativeOnInitialized()
@@ -83,5 +84,14 @@ void UWidget_OptionsScreen::OnBackBoundActionTriggered()
 }
 void UWidget_OptionsScreen::OnOptionsTabSelected(FName TabId)
 {
-	Debug::Print(TEXT("New Tab Selected. Tab ID: ") + TabId.ToString());
+	TArray<UListDataObject_Base*> FoundListSourceItems = GetOrCreateDataRegistry()->GetListSourceItemsBySelectedTabID(TabId);
+
+	CommonListView_OptionsList->SetListItems(FoundListSourceItems);
+	CommonListView_OptionsList->RequestRefresh();
+
+	if (CommonListView_OptionsList->GetNumItems() != 0)
+	{
+		CommonListView_OptionsList->NavigateToIndex(0);
+		CommonListView_OptionsList->SetSelectedIndex(0);
+	}
 }

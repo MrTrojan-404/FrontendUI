@@ -7,6 +7,7 @@
 #include "Blueprint/IUserObjectListEntry.h"
 #include "Widget_ListEntry_Base.generated.h"
 
+class UListDataObject_Base;
 class UCommonTextBlock;
 /**
  * 
@@ -21,6 +22,9 @@ protected:
 	//~ Begin IUserObjectListEntry Interface
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	//~ End IUserObjectListEntry Interface
+
+	//The child class should override this function to handle the initialization needed. Super call is expected
+	virtual void OnOwningListDataObjectSet(UListDataObject_Base* InOwningListDataObject);
 
 private:
 	//***** Bound Widgets ***** //
