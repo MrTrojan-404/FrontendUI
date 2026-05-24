@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FrontendUI/FrontendTypes/FrontendEnumTypes.h"
 #include "UObject/Object.h"
 #include "ListDataObject_Base.generated.h"
 
@@ -19,6 +20,9 @@ class FRONTENDUI_API UListDataObject_Base : public UObject
 	GENERATED_BODY()
 	
 public:
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnListDataModifiedDelegate,UListDataObject_Base*,EOptionsListDataModifyReason)
+	FOnListDataModifiedDelegate OnListDataModified;
+	
 	LIST_DATA_ACCESSOR(FName,DataID)
 	LIST_DATA_ACCESSOR(FText,DataDisplayName)
 	LIST_DATA_ACCESSOR(FText,DescriptionRichText)
@@ -35,6 +39,9 @@ public:
 protected:
 	//Empty in base class. The child classes should override it to handle the initialization needed accrodingly
 	virtual void OnDataObjectInitialized();
+
+	virtual void NotifyListDataModified(UListDataObject_Base* ModifiedData,EOptionsListDataModifyReason ModifyReason = EOptionsListDataModifyReason::DirectlyModified);
+	
 private:
 	FName DataID;
 	FText DataDisplayName;
